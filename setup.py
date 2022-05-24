@@ -21,6 +21,7 @@ version = {}
 with open('bigchaindb/version.py') as fp:
     exec(fp.read(), version)
 
+
 def check_setuptools_features():
     """Check if setuptools is up to date."""
     import pkg_resources
@@ -54,21 +55,21 @@ docs_require = [
 ]
 
 tests_require = [
-    'coverage',
-    'pep8',
-    'flake8',
-    'flake8-quotes==0.8.1',
-    'hypothesis>=5.3.0',
-    # Removed pylint because its GPL license isn't Apache2-compatible
-    'pytest>=3.0.0',
-    'pytest-cov==2.8.1',
-    'pytest-mock',
-    'pytest-xdist',
-    'pytest-flask',
-    'pytest-aiohttp',
-    'pytest-asyncio',
-    'tox',
-] + docs_require
+                    'coverage',
+                    'pep8',
+                    'flake8',
+                    'flake8-quotes==0.8.1',
+                    'hypothesis>=5.3.0',
+                    # Removed pylint because its GPL license isn't Apache2-compatible
+                    'pytest>=3.0.0',
+                    'pytest-cov==2.8.1',
+                    'pytest-mock',
+                    'pytest-xdist',
+                    'pytest-flask',
+                    'pytest-aiohttp',
+                    'pytest-asyncio',
+                    'tox',
+                ] + docs_require
 
 install_requires = [
     'aiohttp==3.6.2',
@@ -93,8 +94,7 @@ if sys.version_info < (3, 6):
     install_requires.append('pysha3~=1.0.2')
 
 setup(
-    name='BigchainDB',
-    version=version['__version__'],
+    name='BigchainDBNextGen',
     description='BigchainDB: The Blockchain Database',
     long_description=(
         "BigchainDB allows developers and enterprises to deploy blockchain "
@@ -105,7 +105,7 @@ setup(
         "query functionality, decentralized control, immutable data storage and "
         "built-in asset support, BigchainDB is like a database with blockchain "
         "characteristics."
-        ),
+    ),
     url='https://github.com/BigchainDB/bigchaindb/',
     author='BigchainDB Contributors',
     author_email='contact@ipdb.global',
@@ -138,7 +138,8 @@ setup(
         ],
     },
     install_requires=install_requires,
-    setup_requires=['pytest-runner'],
+    use_scm_version=True,
+    setup_requires=['pytest-runner', 'setuptools_scm'],
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
