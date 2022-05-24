@@ -36,6 +36,7 @@ ROUTES_API_V1 = [
     r('blocks/<int:block_id>', blocks.BlockApi),
     r('blocks/', blocks.BlockListApi),
     r('transactions/<string:tx_id>', tx.TransactionApi),
+    r('transactions/<string:tx_id>/verify', tx.TransactionVerificationApi),
     r('transactions', tx.TransactionListApi),
     r('outputs/', outputs.OutputListApi),
     r('validators/', validators.ValidatorsApi),

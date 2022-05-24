@@ -7,17 +7,17 @@
 
 For more information please refer to the documentation: http://bigchaindb.com/http-api
 """
+import dataclasses
 import logging
-
+from enum import Enum
 from flask import current_app, request, jsonify
 from flask_restful import Resource, reqparse
 
+from bigchaindb.common.exceptions import SchemaValidationError, ValidationError, InvalidHash
 from bigchaindb.common.transaction_mode_types import BROADCAST_TX_ASYNC
-from bigchaindb.common.exceptions import SchemaValidationError, ValidationError
-from bigchaindb.web.views.base import make_error
-from bigchaindb.web.views import parameters
 from bigchaindb.models import Transaction
-
+from bigchaindb.web.views import parameters
+from bigchaindb.web.views.base import make_error
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,40 @@ class TransactionApi(Resource):
             return make_error(404)
 
         return tx.to_dict()
+
+
+class MutationType(Enum):
+    MODIFICATION = 'MODIFICATION'
+    DELETION = 'DELETION'
+
+
+@dataclasses.dataclass
+class VerificationResult:
+    tx_id: str
+    valid: bool
+    mutation_type: str = None
+
+    def to_dict(self):
+        return {"id": self.tx_id, "valid": self.valid, "mutation_type": self.mutation_type}
+
+
+class TransactionVerificationApi(Resource):
+    def post(self, tx_id):
+        """API endpoint to verify a transaction."""
+        pool = current_app.config['bigchain_pool']
+        verification_result: VerificationResult = VerificationResult(tx_id=tx_id, valid=True)
+
+        with pool() as bigchain:
+            try:
+                tx = bigchain.get_transaction(tx_id)
+                if not tx:
+                    verification_result.valid = False
+                    verification_result.mutation_type = MutationType.DELETION.value
+            except InvalidHash:
+                verification_result.valid = False
+                verification_result.mutation_type = MutationType.MODIFICATION.value
+
+        return jsonify(verification_result.to_dict())
 
 
 class TransactionListApi(Resource):
